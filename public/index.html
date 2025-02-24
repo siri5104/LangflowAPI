@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>City Attractions Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>City Attractions Finder</h1>
+    <div class="input-container">
+        <input type="text" id="cityInput" placeholder="Enter city name">
+        <button onclick="getAttractions()">Get Attractions</button>
+    </div>
+    <div id="output"></div>
+
+    <script>
+        function getAttractions() {
+            const cityName = document.getElementById('cityInput').value.trim();
+            if (!cityName) {
+                alert('Please enter a city name');
+                return;
+            }
+
+            fetch(`http://localhost:3000/cities/${cityName}/attractions`)
+                .then(response => response.json())
+                .then(data => {
+                    const attractionsText = data.attractions;
+
+                    let attractionsArray;
+                    if (typeof attractionsText === 'string') {
+                        attractionsArray = attractionsText.split('\n');
+                    } else if (Array.isArray(attractionsText)) {
+                        attractionsArray = attractionsText;
+                    } else {
+                        throw new Error('Unexpected data format');
+                    }
+
+                    const outputDiv = document.getElementById('output');
+                    outputDiv.innerHTML = '';
+
+                    // Extract the intro line (usually the first line)
+                    const introLine = attractionsArray[0].trim();
+
+                    // Extract attractions (from line 2 onwards)
+                    const cleanAttractions = attractionsArray
+                        .slice(1)
+                        .map(line => line.replace(/\*\*/g, '').trim())
+                        .filter(line => line.includes(':'));
+
+                    // Display the intro line first
+                    const introParagraph = document.createElement('p');
+                    introParagraph.textContent = introLine;
+                    outputDiv.appendChild(introParagraph);
+
+                    if (cleanAttractions.length === 0) {
+                        outputDiv.innerHTML += '<p>No attractions found.</p>';
+                        return;
+                    }
+
+                    // Display numbered attractions
+                    const ol = document.createElement('ol');
+                    cleanAttractions.forEach(attraction => {
+                        const parts = attraction.split(':');
+                        const attractionName = parts[0].trim();
+                        const description = parts.slice(1).join(':').trim();
+
+                        const li = document.createElement('li');
+                        li.innerHTML = `<strong>${attractionName}</strong>: ${description}`;
+                        ol.appendChild(li);
+                    });
+
+                    outputDiv.appendChild(ol);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to fetch attractions');
+                });
+        }
+    </script>
+</body>
+</html>
