@@ -38,16 +38,13 @@
                     const outputDiv = document.getElementById('output');
                     outputDiv.innerHTML = '';
 
-                    // Extract the intro line (usually the first line)
                     const introLine = attractionsArray[0].trim();
 
-                    // Extract attractions (from line 2 onwards)
                     const cleanAttractions = attractionsArray
                         .slice(1)
                         .map(line => line.replace(/\*\*/g, '').trim())
                         .filter(line => line.includes(':'));
 
-                    // Display the intro line first
                     const introParagraph = document.createElement('p');
                     introParagraph.textContent = introLine;
                     outputDiv.appendChild(introParagraph);
@@ -57,7 +54,6 @@
                         return;
                     }
 
-                    // Display numbered attractions
                     const ol = document.createElement('ol');
                     cleanAttractions.forEach(attraction => {
                         const parts = attraction.split(':');
